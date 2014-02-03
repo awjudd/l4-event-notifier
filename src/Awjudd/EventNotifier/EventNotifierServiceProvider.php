@@ -24,7 +24,6 @@ class EventNotifierServiceProvider extends ServiceProvider
     {
         $this->package('awjudd/event-notifier');
 
-        dd($this->is_enabled());
 		// Figure out if we should set up the object
 		if($this->is_enabled())
 		{
@@ -79,7 +78,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 		}
 
 		// Check about the mail notification
-		if($enabled || $section == 'mail' )
+		if($enabled && ( $section == 'mail' || $section == null ) )
 		{
 			// Is the email notification engine enabled?
 			if(Config::get('event-notifier::notification.mail.enabled'))
@@ -89,7 +88,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 		}
 
 		// Check about the SMS notification
-		if($enabled || $section == 'sms' )
+		if($enabled && ($section == 'sms' || $section == null))
 		{
 			// Is the SMS notification engine enabled?
 			if(Config::get('event-notifier::notification.sms.enabled'))
@@ -99,7 +98,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 		}
 
 		// Return whatever we derived
-		return $enabled & $subStatus;
+		return ($enabled & $subStatus) == 1;
 	}
 
 }
