@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-02 23:06:46
+* @Last Modified time: 2014-02-03 06:40:22
 */
 return array (
 
@@ -115,6 +115,34 @@ return array (
             'body' => 'eventnotifier::messages.sms.body',
 
             /**
+             * All of the configuration values for using Twilio
+             * 
+             * @var array
+             */
+            'config' => array (
+                /**
+                 * Your Twilio account's SID
+                 * 
+                 * @var string
+                 */
+                'sid' => 'ACXXXXXX',
+
+                /**
+                 * Your Twilio auth token
+                 * 
+                 * @var string
+                 */
+                'authToken' => 'YYYYYY',
+
+                /**
+                 * Default "from" number for sending SMS messages
+                 * 
+                 * @var string
+                 */
+                'fromNumber' => '+123456789'
+            ),
+
+            /**
              * Whether or not SMS notifications are enabled
              * 
              * @var boolean
@@ -129,5 +157,15 @@ return array (
             'to' => array (
             ),
         ),
+    ),
+
+    'site' => array (
+        /**
+         * The name of the site that errors are being reported on (for the subject
+         * of notifications)
+         * 
+         * @var string
+         */
+        'name' => 'Unnamed',
     ),
 );
