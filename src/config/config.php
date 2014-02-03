@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-02 21:14:13
+* @Last Modified time: 2014-02-02 23:06:46
 */
 return array (
 
@@ -12,7 +12,7 @@ return array (
      * 
      * @var array
      */
-    'enabled' => [
+    'enabled' => array (
 
         /**
          * What environments is this enabled in?  The environment name
@@ -20,17 +20,17 @@ return array (
          * 
          * @var array
          */
-        'environments' => [
+        'environments' => array (
             'production'
-        ],
+        ),
 
         /**
          * Should we force the notification to be enabled?
          * 
          * @var boolean
          */
-        'force' => false,
-    ],
+        'force' => true,
+    ),
 
     /**
      * An array of all of the events that should be monitored
@@ -38,6 +38,27 @@ return array (
      * @var array
      */
     'events' => array (
+
+        /**
+         * An array of any events that should be listened for.
+         * 
+         * @var array
+         */
+        'listeners' => array (
+
+        ),
+
+        /**
+         * An array of any special cases.
+         * 
+         * Handled Options:
+         *  - 'app.error' => App::error()
+         * 
+         * @var array
+         */
+        'special' => array (
+            'app.error',
+        ),
     ),
 
     /**
@@ -46,12 +67,6 @@ return array (
      * @var array
      */
     'notification' => array (
-        /**
-         * Override to dictate whether or not notifications are enabled.
-         * 
-         * @var boolean
-         */
-        'enabled' => true,
 
         /**
          * Settings for any email notifications that are sent (and if enabled)
