@@ -6,6 +6,8 @@ use Config;
 use Event;
 use Exception;
 
+use Sms;
+
 use Illuminate\Support\ServiceProvider;
 
 class EventNotifierServiceProvider extends ServiceProvider
@@ -44,7 +46,14 @@ class EventNotifierServiceProvider extends ServiceProvider
 		// Figure out if we should set up the object
 		if($this->is_enabled())
 		{
-			// We are enabled, so start wiring up the events
+			// Configure Twilio if needed
+			if($this->sms_enabled)
+			{
+				// Map our config values to the config values needed for the Twilio plugin
+				Config::set('laratwilio::laratwilio.accountSid', Config::get('event-notifier::notification.sms.config.sid'));
+				Config::set('laratwilio::laratwilio.authToken', Config::get('event-notifier::notification.sms.config.token'));
+				Config::set('laratwilio::laratwilio.fromNumber', Config::get('event-notifier::notification.sms.config.from'));
+			}
 
 			// Wire up the regular events
 			$this->wire_event_listeners();
@@ -107,7 +116,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 			if(Config::get('event-notifier::notification.mail.enabled'))
 			{
 				$subStatus |= true;
-				$this->email_enabled = (true & $enabled) == true;
+				$this->email_enabled = (true & $enabled) == 1;
 			}
 		}
 
@@ -118,7 +127,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 			if(Config::get('event-notifier::notification.sms.enabled'))
 			{
 				$subStatus |= true;
-				$this->sms_enabled = (true & $enabled) == true;
+				$this->sms_enabled = (true & $enabled) == 1;
 			}
 		}
 
@@ -135,12 +144,17 @@ class EventNotifierServiceProvider extends ServiceProvider
 	{
 		foreach(Config::get('event-notifier::events.listeners', array()) as $event)
 		{
-			Event::listen($event, function(){
+			Event::listen($event, function() use($event) {
 				
 			});
 		}
 	}
 
+	/**
+	 * Wires up all of the special-case listeners
+	 * 
+	 * @return void
+	 */
 	private function wire_special_listeners()
 	{
 		// Grab the list of special events
@@ -149,7 +163,8 @@ class EventNotifierServiceProvider extends ServiceProvider
 		// Check if the application error exists
 		if(in_array('app.error', $special))
 		{
-			App::error(function(Exception $ex){
+			// It did, so wire it through
+			App::error(function(Exception $ex) {
 				
 			});
 		}
