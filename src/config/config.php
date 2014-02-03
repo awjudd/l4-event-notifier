@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-03 06:40:22
+* @Last Modified time: 2014-02-03 06:51:33
 */
 return array (
 
@@ -132,14 +132,14 @@ return array (
                  * 
                  * @var string
                  */
-                'authToken' => 'YYYYYY',
+                'token' => 'YYYYYY',
 
                 /**
                  * Default "from" number for sending SMS messages
                  * 
                  * @var string
                  */
-                'fromNumber' => '+123456789'
+                'from' => '+123456789'
             ),
 
             /**
