@@ -3,6 +3,9 @@
 use App;
 use Config;
 
+use Event;
+use Exception;
+
 use Illuminate\Support\ServiceProvider;
 
 class EventNotifierServiceProvider extends ServiceProvider
@@ -14,6 +17,20 @@ class EventNotifierServiceProvider extends ServiceProvider
 	 * @var bool
 	 */
 	protected $defer = false;
+
+	/**
+	 * Whether or not email notifications are enabled.
+	 * 
+	 * @var boolean
+	 */
+	private $email_enabled = false;
+
+	/**
+	 * Whether or not SMS notifications are enabled.
+	 * 
+	 * @var boolean
+	 */
+	private $sms_enabled = false;
 
 	/**
      * Bootstrap the service provider.
@@ -28,6 +45,12 @@ class EventNotifierServiceProvider extends ServiceProvider
 		if($this->is_enabled())
 		{
 			// We are enabled, so start wiring up the events
+
+			// Wire up the regular events
+			$this->wire_event_listeners();
+
+			// Wire up the special case events
+			$this->wire_special_listeners();
 		}
     }
 
@@ -84,6 +107,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 			if(Config::get('event-notifier::notification.mail.enabled'))
 			{
 				$subStatus |= true;
+				$this->email_enabled = (true & $enabled) == true;
 			}
 		}
 
@@ -94,11 +118,41 @@ class EventNotifierServiceProvider extends ServiceProvider
 			if(Config::get('event-notifier::notification.sms.enabled'))
 			{
 				$subStatus |= true;
+				$this->sms_enabled = (true & $enabled) == true;
 			}
 		}
 
 		// Return whatever we derived
 		return ($enabled & $subStatus) == 1;
+	}
+
+	/**
+	 * Wires up all of the necessary event listeners
+	 * 
+	 * @return void
+	 */
+	private function wire_event_listeners()
+	{
+		foreach(Config::get('event-notifier::events.listeners', array()) as $event)
+		{
+			Event::listen($event, function(){
+				
+			});
+		}
+	}
+
+	private function wire_special_listeners()
+	{
+		// Grab the list of special events
+		$special = Config::get('event-notifier::events.special', array());
+
+		// Check if the application error exists
+		if(in_array('app.error', $special))
+		{
+			App::error(function(Exception $ex){
+				
+			});
+		}
 	}
 
 }
