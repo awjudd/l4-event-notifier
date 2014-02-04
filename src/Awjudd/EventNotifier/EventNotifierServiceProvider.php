@@ -5,6 +5,7 @@ use Config;
 use Event;
 use Exception;
 use Sms;
+use Str;
 use Lang;
 
 use Illuminate\Support\ServiceProvider;
@@ -166,7 +167,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 		{
 			// It did, so wire it through
 			App::error(function(Exception $ex) {
-				
+				$this->send_sms('Application Error - ' . $ex->getMessage());
 			});
 		}
 	}
@@ -178,6 +179,13 @@ class EventNotifierServiceProvider extends ServiceProvider
 	 */
 	private function send_sms($event)
 	{
+		// Check if SMSes are enabled
+		if(!$this->sms_enabled)
+		{
+			// It isn't enabled, so just return
+			return;
+		}
+
 		// Loop thorugh all of the phone numbers
 		foreach(Config::get('event-notifier::notification.sms.to', array()) as $number)
 		{
@@ -185,7 +193,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 			Sms::send(
 				array(
 					'to' => $number,
-					'text' => Lang::get(Config::get('event-notifier::notification.sms.body'), array('event' => $event)),
+					'text' => Lang::get(Config::get('event-notifier::notification.sms.body'), array('event' => Str::limit($event, 50))),
 				)
 			);
 		}
