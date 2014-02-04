@@ -2,11 +2,10 @@
 
 use App;
 use Config;
-
 use Event;
 use Exception;
-
 use Sms;
+use Lang;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -142,10 +141,12 @@ class EventNotifierServiceProvider extends ServiceProvider
 	 */
 	private function wire_event_listeners()
 	{
+		// Cycle through all of the events that are set to listen for
 		foreach(Config::get('event-notifier::events.listeners', array()) as $event)
 		{
+			// Add in a listener
 			Event::listen($event, function() use($event) {
-				
+				$this->send_sms($event);
 			});
 		}
 	}
@@ -167,6 +168,26 @@ class EventNotifierServiceProvider extends ServiceProvider
 			App::error(function(Exception $ex) {
 				
 			});
+		}
+	}
+
+	/**
+	 * Sends a SMS message to all of the desired recipients.
+	 * 
+	 * @param string $event The name of the event that was captured
+	 */
+	private function send_sms($event)
+	{
+		// Loop thorugh all of the phone numbers
+		foreach(Config::get('event-notifier::notification.sms.to', array()) as $number)
+		{
+			// Send out an email
+			Sms::send(
+				array(
+					'to' => $number,
+					'text' => Lang::get(Config::get('event-notifier::notification.sms.body'), array('event' => $event)),
+				)
+			);
 		}
 	}
 
