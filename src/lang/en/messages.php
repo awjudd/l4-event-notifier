@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 21:15:05
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-02 21:20:50
+* @Last Modified time: 2014-02-03 07:03:16
 */
 return array (
 
@@ -39,6 +39,6 @@ return array (
          * 
          * @var string
          */
-        'body' => '',
+        'body' => 'The event (:event) just occurred.',
     ),
 );
