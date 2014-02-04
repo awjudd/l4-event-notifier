@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-03 06:51:33
+* @Last Modified time: 2014-02-03 21:11:27
 */
 return array (
 
@@ -112,7 +112,7 @@ return array (
              * 
              * @var string
              */
-            'body' => 'eventnotifier::messages.sms.body',
+            'body' => 'event-notifier::messages.sms.body',
 
             /**
              * All of the configuration values for using Twilio
