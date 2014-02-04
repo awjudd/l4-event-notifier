@@ -4,6 +4,7 @@ use App;
 use Config;
 use Event;
 use Exception;
+use Mail;
 use Sms;
 use Str;
 use Lang;
@@ -212,7 +213,7 @@ class EventNotifierServiceProvider extends ServiceProvider
 						)
 					);
 
-		Mail::queue($body, array(), function($message) use($title) {
+		Mail::queue(array('text' => 'view'), $body, function($message) use($title) {
 			$message->to(Config::get('event-notifier::notification.mail.to', array()));
 
 			$message->subject($title);
