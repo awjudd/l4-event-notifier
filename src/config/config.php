@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-03 21:11:27
+* @Last Modified time: 2014-02-03 21:31:46
 */
 return array (
 
@@ -74,6 +74,13 @@ return array (
          * @var array
          */
         'mail' => array (
+
+            /**
+             * Whether or not to attach the stacktrace on the email.
+             * 
+             * @var boolean
+             */
+            'attach_stacktrace' => true,
 
             /**
              * The name in the resource file for the email's body template.

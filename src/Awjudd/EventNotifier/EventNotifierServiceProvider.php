@@ -167,15 +167,63 @@ class EventNotifierServiceProvider extends ServiceProvider
 		{
 			// It did, so wire it through
 			App::error(function(Exception $ex) {
+				$this->send_email('Application Error', $ex->getMessage());
 				$this->send_sms('Application Error - ' . $ex->getMessage());
 			});
 		}
 	}
 
 	/**
+	 * Sends a detailed email to the recipient.
+	 * 
+	 * @param string $event The event that occurred
+	 * @param string $additional Any additional information that should be provided
+	 * @param string $extended Any extended information required.
+	 * @return void
+	 */
+	private function send_email($event, $additional, $extended = null)
+	{
+		// Check if emails are enabled
+		if(!$this->email_enabled)
+		{
+			// It isn't enabled, so just return
+			return;
+		}
+
+		// Figure out the status of stack traces
+		$stacktrace_enabled = Config::get('event-notifier::notification.mail.attach_stacktrace', true);
+
+		$title = Lang::get(
+						Config::get('event-notifier::notification.mail.subject'),
+						array(
+							'event' => Str::limit($event, 50),
+							'site' => Config::get('event-notifier::site.name'),
+						)
+					);
+
+		$body = Lang::get(
+						Config::get('event-notifier::notification.mail.body'), 
+						array(
+							'additional' => $additional,
+							'event' => $event,
+							'extended' => $extended,
+							'site' => Config::get('event-notifier::site.name'),
+							'stacktrace' => $stacktrace_enabled ? 'was' : 'was not',
+						)
+					);
+
+		Mail::queue($body, array(), function($message) use($title) {
+			$message->to(Config::get('event-notifier::notification.mail.to', array()));
+
+			$message->subject($title);
+		});
+	}
+
+	/**
 	 * Sends a SMS message to all of the desired recipients.
 	 * 
 	 * @param string $event The name of the event that was captured
+	 * @return void
 	 */
 	private function send_sms($event)
 	{
@@ -193,7 +241,13 @@ class EventNotifierServiceProvider extends ServiceProvider
 			Sms::send(
 				array(
 					'to' => $number,
-					'text' => Lang::get(Config::get('event-notifier::notification.sms.body'), array('event' => Str::limit($event, 50))),
+					'text' => Lang::get(
+						Config::get('event-notifier::notification.sms.body'), 
+						array(
+							'event' => Str::limit($event, 50),
+							'site' => Config::get('event-notifier::site.name'),
+						)
+					),
 				)
 			);
 		}
