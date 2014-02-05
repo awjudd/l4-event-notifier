@@ -3,7 +3,7 @@
 * @Author: Andrew Judd
 * @Date:   2014-02-02 19:25:26
 * @Last Modified by:   Andrew Judd
-* @Last Modified time: 2014-02-03 21:31:46
+* @Last Modified time: 2014-02-05 06:41:17
 */
 return array (
 
@@ -87,7 +87,7 @@ return array (
              * 
              * @var string
              */
-            'body' => 'eventnotifier::messages.mail.body',
+            'body' => 'event-notifier::messages.mail.body',
 
             /**
              * Whether or not email notifications are enabled
@@ -101,7 +101,7 @@ return array (
              * 
              * @var string
              */
-            'subject' => 'eventnotifier::messages.mail.subject',
+            'subject' => 'event-notifier::messages.mail.subject',
 
             /**
              * An array of email addresses to send the notification to

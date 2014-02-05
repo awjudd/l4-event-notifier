@@ -191,8 +191,13 @@ class EventNotifierServiceProvider extends ServiceProvider
 			return;
 		}
 
+		$stacktrace = null;
+
 		// Figure out the status of stack traces
-		$stacktrace_enabled = Config::get('event-notifier::notification.mail.attach_stacktrace', true);
+		if($stacktrace_enabled = Config::get('event-notifier::notification.mail.attach_stacktrace', true))
+		{
+
+		}
 
 		$title = Lang::get(
 						Config::get('event-notifier::notification.mail.subject'),
@@ -201,21 +206,17 @@ class EventNotifierServiceProvider extends ServiceProvider
 							'site' => Config::get('event-notifier::site.name'),
 						)
 					);
-
-		$body = Lang::get(
-						Config::get('event-notifier::notification.mail.body'), 
-						array(
-							'additional' => $additional,
-							'event' => $event,
-							'extended' => $extended,
-							'site' => Config::get('event-notifier::site.name'),
-							'stacktrace' => $stacktrace_enabled ? 'was' : 'was not',
-						)
-					);
-
-		Mail::queue(array('text' => 'view'), $body, function($message) use($title) {
+ 
+ 		$data = array(
+			'additional' => $additional,
+			'event' => $event,
+			'extended' => $extended,
+			'site' => Config::get('event-notifier::site.name'),
+			'stacktrace' => $stacktrace_enabled ? 'was' : 'was not',
+		);
+						
+		Mail::send(array( 'text' => Config::get('event-notifier::notification.mail.body') ), $data, function($message) use($title, $stacktrace_enabled) {
 			$message->to(Config::get('event-notifier::notification.mail.to', array()));
-
 			$message->subject($title);
 		});
 	}
