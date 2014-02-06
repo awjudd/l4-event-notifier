@@ -35,6 +35,9 @@ class EventNotifierServiceProvider extends ServiceProvider
 	 */
 	private $sms_enabled = false;
 
+
+	private $storage = null;
+
 	/**
      * Bootstrap the service provider.
      *
@@ -61,6 +64,15 @@ class EventNotifierServiceProvider extends ServiceProvider
 
 			// Wire up the special case events
 			$this->wire_special_listeners();
+
+			$this->storage = storage_path(Config::get('event-notifier::storage'));
+
+			// Setup the storage directory
+			if(!file_exists($this->storage))
+			{
+				// It didn't exist, so make the folder
+				mkdir($this->storage, 0777);
+			}
 		}
     }
 
@@ -179,10 +191,9 @@ class EventNotifierServiceProvider extends ServiceProvider
 	 * 
 	 * @param string $event The event that occurred
 	 * @param string $additional Any additional information that should be provided
-	 * @param string $extended Any extended information required.
 	 * @return void
 	 */
-	private function send_email($event, $additional, $extended = null)
+	private function send_email($event, $additional)
 	{
 		// Check if emails are enabled
 		if(!$this->email_enabled)
@@ -191,32 +202,25 @@ class EventNotifierServiceProvider extends ServiceProvider
 			return;
 		}
 
-		$stacktrace = null;
-
-		// Figure out the status of stack traces
-		if($stacktrace_enabled = Config::get('event-notifier::notification.mail.attach_stacktrace', true))
-		{
-
-		}
-
-		$title = Lang::get(
-						Config::get('event-notifier::notification.mail.subject'),
-						array(
-							'event' => Str::limit($event, 50),
-							'site' => Config::get('event-notifier::site.name'),
-						)
-					);
+		$title = Lang::get( Config::get('event-notifier::notification.mail.subject'),
+				array(
+					'event' => Str::limit($event, 50),
+					'site' => Config::get('event-notifier::site.name'),
+				)
+			);
  
  		$data = array(
 			'additional' => $additional,
 			'event' => $event,
-			'extended' => $extended,
 			'site' => Config::get('event-notifier::site.name'),
-			'stacktrace' => $stacktrace_enabled ? 'was' : 'was not',
 		);
 						
-		Mail::send(array( 'text' => Config::get('event-notifier::notification.mail.body') ), $data, function($message) use($title, $stacktrace_enabled) {
+		// Send an email
+		Mail::queue(array( 'text' => Config::get('event-notifier::notification.mail.body') ), $data, function($message) use($title) {
+			// Who will receive the file?
 			$message->to(Config::get('event-notifier::notification.mail.to', array()));
+
+			// Define the subject
 			$message->subject($title);
 		});
 	}
